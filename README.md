@@ -1,2 +1,2 @@
 # diagnostico
-Online diagnostic tools for sys-admins
+Simple diagnotic tools, built for sysadmins
