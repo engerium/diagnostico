@@ -49,14 +49,28 @@ function query() {
 	if (validateIP(input)) {
 		ipaddr = input;
 		domain = getHost(input);
+		$(".sub").css({"background-color": "#43A047"});
+
+		// If domain is undefined
+		if (!domain) {
+			domain = "No hostname found"
+			$(".sub").css({"background-color": "#FFB300"});
+		}
 	} else {
 		ipaddr = getIP(input);
 		domain = input;
+		$(".sub").css({"background-color": "#43A047"});
+
+		// If IP is undefined
+		if (!ipaddr) {
+			ipaddr = "Invalid hostname"
+			$(".sub").css({"background-color": "#D32F2F"});
+		}
 	}
 
 	$("#results").empty(); // Empty past results
-	$("#results").append("<h1>" + ipaddr + "</h1>"); // Add seach query
-	$("#results").append("<h2>" + domain + "</h2>");
+	$("#results").append("<h1>" + ipaddr + "</h1>"); // Add IP to results
+	$("#results").append("<h2>" + domain + "</h2>"); // Add domain to results
 
 	$(".sub").removeClass("hidden"); // Show results
 	$("#search-input").val("").blur(); // Unfocus search input
