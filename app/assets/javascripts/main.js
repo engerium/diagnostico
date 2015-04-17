@@ -2,6 +2,7 @@
 var spinner;
 var target;
 var opts;
+var diagnosticoFQDN;
 
 // Document ready function
 $(function() {
@@ -27,6 +28,7 @@ $(function() {
 
 	target = document.getElementsByTagName("body")[0];
 	spinner = new Spinner(opts);
+	diagnosticoFQDN = window.location.href;
 
 	$("#search-input").keyup(function(e) {
 		if(e.keyCode === 13) {
@@ -53,7 +55,7 @@ function query() {
 
 		// If domain is undefined
 		if (!domain) {
-			domain = "No hostname found"
+			domain = "No domain found"
 			$(".sub").css({"background-color": "#FFB300"});
 		}
 	} else {
@@ -63,7 +65,7 @@ function query() {
 
 		// If IP is undefined
 		if (!ipaddr) {
-			ipaddr = "Invalid hostname"
+			ipaddr = "Invalid domain"
 			$(".sub").css({"background-color": "#D32F2F"});
 		}
 	}
@@ -91,11 +93,16 @@ function getIP(input) {
 	var returnVal;
 	$.ajax({
 		type: "GET",
-		url: "http://api.statdns.com/" + input + "/a",
+		url: diagnosticoFQDN + "api/getip/" + btoa(input),
 		datatype: "json",
 		async: false,
 		success: function(data) {
-			returnVal = data.answer[0].rdata;
+			try {
+				returnVal = data.answer[0].rdata;
+			} catch (e) {
+				returnVal = null;
+			}
+			
 		},
 		error: function(data) {
 			console.log(data);
@@ -104,16 +111,20 @@ function getIP(input) {
 	return returnVal;
 }
 
-// Resolve host function
+// Resolve domain function
 function getHost(input) {
 	var returnVal;
 	$.ajax({
 		type: "GET",
-		url: "http://api.statdns.com/x/" + input,
+		url: diagnosticoFQDN + "api/getdomain/" + btoa(input),
 		datatype: "json",
 		async: false,
 		success: function(data) {
-			returnVal = data.answer[0].rdata;
+			try {
+				returnVal = data.answer[0].rdata;
+			} catch (e) {
+				returnVal = null;
+			}
 		},
 		error: function(data) {
 			console.log(data);
