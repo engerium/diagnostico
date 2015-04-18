@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Api::GetipControllerTest < ActionController::TestCase
+class Api::ApiControllerTest < ActionController::TestCase
   # test "the truth" do
   #   assert true
   # end
