@@ -2,10 +2,9 @@ Rails.application.routes.draw do
   root 'home#index'
 
   namespace :api do
-      #get '/getip/:domain', to: 'getip#index'
-      #get '/getdomain/:ipaddr', to: 'getdomain#index'
       get '/getdomain/:ipaddr', to: 'api#getdomain'
       get '/getip/:domain', to: 'api#getip'
+      get '/whois/:query', to: 'api#whois'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

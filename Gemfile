@@ -24,12 +24,19 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
+
 # Bootstrap
 gem 'bootstrap-sass', '~> 3.3.4'
 # SpinJS
 gem 'spinjs-rails'
 # HTTParty
 gem 'httparty'
+# Whois
+gem 'whois'
+# IPAddress
+gem 'ipaddress'
+# Net-DNS
+gem 'net-dns'
 
 # Heroku
 gem 'rails_12factor', group: :production

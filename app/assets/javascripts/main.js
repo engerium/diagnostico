@@ -108,6 +108,29 @@ function getIP(input) {
 			console.log(data);
 		}
 	});
+
+	// If still not an IP address
+	if (!validateIP(returnVal)) {
+		console.log(returnVal + " recur");
+		$.ajax({
+			type: "GET",
+			url: diagnosticoFQDN + "api/getip/" + btoa(returnVal),
+			datatype: "json",
+			async: false,
+			success: function(data) {
+				try {
+					returnVal = data.answer[0].rdata;
+				} catch (e) {
+					returnVal = null;
+				}
+				
+			},
+			error: function(data) {
+				console.log(data);
+			}
+		});
+	}
+
 	return returnVal;
 }
 
