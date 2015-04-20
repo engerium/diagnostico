@@ -1,16 +1,16 @@
 class Api::ApiController < ApplicationController
 	def getdomain
 		domain = Base64.decode64(params[:ipaddr])
-		response = HTTParty.get('http://api.statdns.com/x/' + domain)
+		response = HTTParty.get("http://api.statdns.com/x/#{domain}")
 
-		render json: JSON.parse(response.body)
+		render json: response.body
 	end
 
 	def getip
 		domain = Base64.decode64(params[:domain])
-		response = HTTParty.get('http://api.statdns.com/' + domain + "/a")
+		response = HTTParty.get("http://api.statdns.com/#{domain}/a")
 
-		render json: JSON.parse(response.body)
+		render json: response.body
 	end
 
 	def whois
@@ -18,14 +18,12 @@ class Api::ApiController < ApplicationController
 		whois_response = Whois.whois(query)
 
 		if (IPAddress.valid? query)
-			split_query = query.split(".")
-			reverse_query = "#{split_query[3]}.#{split_query[2]}.#{split_query[1]}.#{split_query[0]}"
+			geoip_response = HTTParty.get("http://www.telize.com/geoip/#{query}")
 
-			dig_packet = Net::DNS::Resolver.start("#{reverse_query}.origin.asn.cymru.com", Net::DNS::TXT)
-			dig_answer = dig_packet.answer
+			whois_json = {"whois": whois_response.to_s}.to_json
+			concat_json = [geoip_response.body, whois_json].map{ |o| JSON[o] }.to_json
 
-			#render json: dig_answer
-			#render json: whois_response
+			render json: concat_json
 		else
 			whois_parser = whois_response.parser
 
