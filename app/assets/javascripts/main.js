@@ -43,38 +43,67 @@ $(function() {
 function query() {
 	
 	// Variables
+	var results = {};
 	var input = $("#search-input").val();
 	var ipaddr;
 	var domain;
+	var name;
+	var organization;
+	var city;
+	var state;
+
 
 	// Check if input is a valid IP address else check DNS
 	if (validateIP(input)) {
 		ipaddr = input;
 		domain = getHost(input);
-		$(".sub").css({"background-color": "#43A047"});
+		$(".sub-q").css({"background-color": "#43A047"});
 
 		// If domain is undefined
 		if (!domain) {
 			domain = "No domain found"
-			$(".sub").css({"background-color": "#FFB300"});
+			$(".sub-q").css({"background-color": "#FFB300"});
 		}
 	} else {
 		ipaddr = getIP(input);
 		domain = input;
-		$(".sub").css({"background-color": "#43A047"});
+
+		results = getWhois(domain);
+		try {
+			name = results.name;
+			organization = results.organization;
+			city = results.city;
+			state = results.state;
+		} catch (e) {
+			name, organization, city, state = null;
+		}
+
+		$(".sub-q").css({"background-color": "#43A047"});
 
 		// If IP is undefined
 		if (!ipaddr) {
 			ipaddr = "Invalid domain"
-			$(".sub").css({"background-color": "#D32F2F"});
+			$(".sub-q").css({"background-color": "#D32F2F"});
 		}
 	}
 
-	$("#results").empty(); // Empty past results
-	$("#results").append("<h1>" + ipaddr + "</h1>"); // Add IP to results
-	$("#results").append("<h2>" + domain + "</h2>"); // Add domain to results
+	$("#results-q").empty(); // Empty past q results
+	$("#results-d").empty(); // Empty past d results
+	$(".sub-q").addClass("hidden"); // Make div hidden as originally declared
+	$(".sub-d").addClass("hidden"); // Make div hidden as originally declared
 
-	$(".sub").removeClass("hidden"); // Show results
+	$("#results-q").append("<h1>" + ipaddr + "</h1>");
+	$("#results-q").append("<h2>" + domain + "</h2>");
+
+	$(".sub-q").removeClass("hidden"); // Show q results
+
+	if (name && organization && city && state) {	
+		$("#results-d").append("<h2>" + name + "</h2>");
+		$("#results-d").append("<h3><i>" + organization + "</i></h3>");
+		$("#results-d").append("<h3>" + city + ", " + state + "</h3>");
+		$(".sub-d").removeClass("hidden"); // Show d results
+	}
+
 	$("#search-input").val("").blur(); // Unfocus search input
 }
 
@@ -153,5 +182,29 @@ function getHost(input) {
 			console.log(data);
 		}
 	});
+
+	return returnVal;
+}
+
+// Get whois information
+function getWhois(input) {
+	var returnVal;
+	$.ajax({
+		type: "GET",
+		url: diagnosticoFQDN + "api/whois/" + btoa(input),
+		datatype: "json",
+		async: false,
+		success: function(data) {
+			try {
+				returnVal = data[0];
+			} catch (e) {
+				returnVal = null;
+			}
+		},
+		error: function(data) {
+			console.log(data);
+		}
+	});
+
 	return returnVal;
 }

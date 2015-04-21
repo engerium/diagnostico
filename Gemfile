@@ -35,8 +35,6 @@ gem 'httparty'
 gem 'whois'
 # IPAddress
 gem 'ipaddress'
-# Net-DNS
-gem 'net-dns'
 
 # Heroku
 gem 'rails_12factor', group: :production
