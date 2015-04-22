@@ -20,7 +20,9 @@ class Api::ApiController < ApplicationController
 		if (IPAddress.valid? query)
 			geoip_response = HTTParty.get("http://www.telize.com/geoip/#{query}")
 
-			whois_json = {"whois": whois_response.to_s}.to_json
+			whois_json = {}
+			whois_json['whois'] = whois_response.to_s
+			whois_json = whois_json.to_json
 			concat_json = [geoip_response.body, whois_json].map{ |o| JSON[o] }.to_json
 
 			render json: concat_json
