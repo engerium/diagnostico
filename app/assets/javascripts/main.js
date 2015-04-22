@@ -70,44 +70,48 @@ function query() {
 	if (validateIP(input)) {
 		ipaddr = input;
 		domain = getHost(input);
-		$(".sub-q").css({"background-color": "#43A047"});
 
 		// If domain is undefined
 		if (!domain) {
 			domain = "No domain found"
 			$(".sub-q").css({"background-color": "#FFB300"});
 		}
+
 	} else {
 		ipaddr = getIP(input);
 		domain = input;
 
-		try {
-			results = getWhois(domain)[0];
-			name = results.name;
-			organization = results.organization;
-			city = results.city;
-			state = results.state;
-		} catch (e) {
-			name, organization, city, state = null;
-		}
+		if (validateIP(ipaddr)) {
 
-		$(".sub-q").css({"background-color": "#43A047"});
+			try {
+				results = getWhois(domain)[0];
+				name = results.name;
+				organization = results.organization;
+				city = results.city;
+				state = results.state;
+			} catch (e) {
+				name, organization, city, state = null;
+			}
 
-		// If IP is undefined
-		if (!ipaddr) {
+		} else {
 			ipaddr = "Unresolvable domain"
 			$(".sub-q").css({"background-color": "#D32F2F"});
+			$("#results-q").empty(); // Empty past q results
+			$("#results-d").empty(); // Empty past d results
+			$("#results-w").empty(); // Empty past d results
+			$(".sub-q").addClass("hidden"); // Make div hidden as originally declared
+			$(".sub-d").addClass("hidden"); // Make div hidden as originally declared
+			$(".sub-w").addClass("hidden"); // Make div hidden as originally declared
 		}
 	}
 
 	// Only get whois if there is a valid IP address
-	if (ipaddr) {
+	if (validateIP(ipaddr)) {
 
 		try {
 			ip_results = getWhois(ipaddr);
 			ip_info = ip_results[0];
 			ip_whois = ip_results[1].whois;
-		
 		
 			ip_longitude = ip_info.longitude;
 			ip_latitude = ip_info.latitude;
@@ -120,7 +124,7 @@ function query() {
 		} catch (e) {
 			ip_latitude, ip_longitude, ip_asn, ip_city, ip_region, ip_country, ip_cc, ip_isp, ip_whois = null;
 		}
-		
+
 		console.log(ip_latitude, ip_longitude, ip_asn, ip_city, ip_region, ip_country, ip_cc, ip_isp, ip_whois);
 
 	} else {
@@ -134,10 +138,12 @@ function query() {
 	$(".sub-d").addClass("hidden"); // Make div hidden as originally declared
 	$(".sub-w").addClass("hidden"); // Make div hidden as originally declared
 
+	// Display queried IP and Domin
 	$("#results-q").append("<h1>" + ipaddr + "</h1>");
 	$("#results-q").append("<h2><i>" + domain + "</i></h2>");
 	$(".sub-q").removeClass("hidden"); // Show q results
 
+	// Display domain information if available
 	if (name && organization && city && state) {	
 		$("#results-d").append("<h2>" + name + "</h2>");
 		$("#results-d").append("<h3><i>" + organization + "</i></h3>");
@@ -145,10 +151,12 @@ function query() {
 		$(".sub-d").removeClass("hidden"); // Show d results
 	}
 
-	if (ipaddr) {
+	// Display IP address information if available
+	if (validateIP(ipaddr)) {
 		$("#results-w").append("<h2>" + ip_asn + "</h2>");
 		$("#results-w").append("<h3><i>" + ip_isp + "</i></h3>");
 		$("#results-w").append("<h3>" + ip_country + "</h3>");
+		
 		if (ip_city) {
 			if (ip_region) {
 				$("#results-w").append("<h3>" + ip_city + ", " + ip_region + "</h3>");
@@ -156,10 +164,12 @@ function query() {
 				$("#results-w").append("<h3>" + ip_city +"</h3>");
 			}
 		}
+
 		$(".sub-w").removeClass("hidden"); // Show w results
 	}
 
-	$("#search-input").val("").blur(); // Unfocus search input
+	// Unfocus search input
+	$("#search-input").val("").blur();
 }
 
 
@@ -195,7 +205,6 @@ function getIP(input) {
 
 	// If still not an IP address
 	if (!validateIP(returnVal)) {
-		console.log(returnVal + " recur");
 		$.ajax({
 			type: "GET",
 			url: diagnosticoFQDN + "api/getip/" + btoa(returnVal),

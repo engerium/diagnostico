@@ -38,6 +38,7 @@ gem 'ipaddress'
 
 # Heroku
 gem 'rails_12factor', group: :production
+gem "passenger"
 
 
 # Use ActiveModel has_secure_password
