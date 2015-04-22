@@ -33,6 +33,7 @@ $(function() {
 	$("#search-input").keyup(function(e) {
 		if(e.keyCode === 13) {
 			query();
+			$("#search-input").blur(); // Unfocus search input
 		}
 	});
 
@@ -43,14 +44,26 @@ $(function() {
 function query() {
 	
 	// Variables
-	var results = {};
-	var input = $("#search-input").val();
+	var results;
+	var ip_results;
+	var ip_info;
+	var input = $("#search-input").val().trim();
 	var ipaddr;
 	var domain;
 	var name;
 	var organization;
 	var city;
 	var state;
+	var ip_longitude;
+	var ip_latitude;
+	var ip_asn;
+	var ip_city;
+	var ip_region;
+	var ip_country;
+	var ip_cc;
+	var ip_isp;
+	var ip_whois;
+
 
 
 	// Check if input is a valid IP address else check DNS
@@ -68,8 +81,8 @@ function query() {
 		ipaddr = getIP(input);
 		domain = input;
 
-		results = getWhois(domain);
 		try {
+			results = getWhois(domain)[0];
 			name = results.name;
 			organization = results.organization;
 			city = results.city;
@@ -82,19 +95,47 @@ function query() {
 
 		// If IP is undefined
 		if (!ipaddr) {
-			ipaddr = "Invalid domain"
+			ipaddr = "Unresolvable domain"
 			$(".sub-q").css({"background-color": "#D32F2F"});
 		}
 	}
 
+	// Only get whois if there is a valid IP address
+	if (ipaddr) {
+
+		try {
+			ip_results = getWhois(ipaddr);
+			ip_info = ip_results[0];
+			ip_whois = ip_results[1].whois;
+		
+		
+			ip_longitude = ip_info.longitude;
+			ip_latitude = ip_info.latitude;
+			ip_asn = ip_info.asn;
+			ip_city = ip_info.city;
+			ip_region = ip_info.region;
+			ip_country = ip_info.country;
+			ip_cc = ip_info.country_code3;
+			ip_isp = ip_info.isp;
+		} catch (e) {
+			ip_latitude, ip_longitude, ip_asn, ip_city, ip_region, ip_country, ip_cc, ip_isp, ip_whois = null;
+		}
+		
+		console.log(ip_latitude, ip_longitude, ip_asn, ip_city, ip_region, ip_country, ip_cc, ip_isp, ip_whois);
+
+	} else {
+		ip_latitude, ip_longitude, ip_asn, ip_city, ip_region, ip_country, ip_cc, ip_isp, ip_whois = null;
+	}
+
 	$("#results-q").empty(); // Empty past q results
 	$("#results-d").empty(); // Empty past d results
+	$("#results-w").empty(); // Empty past d results
 	$(".sub-q").addClass("hidden"); // Make div hidden as originally declared
 	$(".sub-d").addClass("hidden"); // Make div hidden as originally declared
+	$(".sub-w").addClass("hidden"); // Make div hidden as originally declared
 
 	$("#results-q").append("<h1>" + ipaddr + "</h1>");
-	$("#results-q").append("<h2>" + domain + "</h2>");
-
+	$("#results-q").append("<h2><i>" + domain + "</i></h2>");
 	$(".sub-q").removeClass("hidden"); // Show q results
 
 	if (name && organization && city && state) {	
@@ -102,6 +143,20 @@ function query() {
 		$("#results-d").append("<h3><i>" + organization + "</i></h3>");
 		$("#results-d").append("<h3>" + city + ", " + state + "</h3>");
 		$(".sub-d").removeClass("hidden"); // Show d results
+	}
+
+	if (ipaddr) {
+		$("#results-w").append("<h2>" + ip_asn + "</h2>");
+		$("#results-w").append("<h3><i>" + ip_isp + "</i></h3>");
+		$("#results-w").append("<h3>" + ip_country + "</h3>");
+		if (ip_city) {
+			if (ip_region) {
+				$("#results-w").append("<h3>" + ip_city + ", " + ip_region + "</h3>");
+			} else {
+				$("#results-w").append("<h3>" + ip_city +"</h3>");
+			}
+		}
+		$(".sub-w").removeClass("hidden"); // Show w results
 	}
 
 	$("#search-input").val("").blur(); // Unfocus search input
@@ -196,7 +251,7 @@ function getWhois(input) {
 		async: false,
 		success: function(data) {
 			try {
-				returnVal = data[0];
+				returnVal = data;
 			} catch (e) {
 				returnVal = null;
 			}
