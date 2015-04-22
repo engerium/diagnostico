@@ -70,6 +70,7 @@ function query() {
 	if (validateIP(input)) {
 		ipaddr = input;
 		domain = getHost(input);
+		$(".sub-q").css({"background-color": "#43A047"});
 
 		// If domain is undefined
 		if (!domain) {
@@ -89,6 +90,7 @@ function query() {
 				organization = results.organization;
 				city = results.city;
 				state = results.state;
+				$(".sub-q").css({"background-color": "#43A047"});
 			} catch (e) {
 				name, organization, city, state = null;
 			}
