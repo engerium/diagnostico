@@ -22,11 +22,11 @@ $(function() {
 		hwaccel: true, // Whether to use hardware acceleration
 		className: 'spinner', // The CSS class to assign to the spinner
 		zIndex: 2e9, // The z-index (defaults to 2000000000)
-		top: '22%', // Top position relative to parent
+		top: '48%', // Top position relative to parent
 		left: '50%' // Left position relative to parent
 	};
 
-	target = document.getElementsByTagName("body")[0];
+	target = document.getElementById("spinjs");
 	spinner = new Spinner(opts);
 	diagnosticoFQDN = window.location.href;
 
@@ -157,6 +157,8 @@ function getIP(input) {
 								// Get IP address from JSON
 								ipaddr = data.answer[0].rdata;
 
+								cl("[DEBUG] getIP() 2nd success try : " + ipaddr); //Debug
+
 								// Diplay query information
 								qDisplay(ipaddr, input);
 
@@ -169,6 +171,9 @@ function getIP(input) {
 
 								// Display query error
 								queryError("Unresolvable domain", input);
+
+								// Stop spinjs
+								spinner.stop();
 
 							}
 							
@@ -243,7 +248,7 @@ function getWhois(input, type) {
 				} catch (e) {
 					// Set variables to null
 					name, organization, city, state = null;
-					cl("[DEBUG] getWhois() catch d : " + data); //Debug
+					cl("[DEBUG] getWhois() catch d : " + data + " | " + input); //Debug
 				}
 
 			} else {
@@ -367,6 +372,9 @@ function queryError(ipaddr, domain) {
 
 	// Remove search input
 	$("#search-input").val("");
+
+	// Stop spinjs
+	spinner.stop();
 	
 }
 
